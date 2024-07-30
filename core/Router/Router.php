@@ -10,8 +10,7 @@ class Router
     protected string $method_field;
     protected array $routes;
     private array $params = [];
-
-    private $res = false;
+    private bool $res = false;
 
     public function __construct()
     {
@@ -36,7 +35,7 @@ class Router
         return $method_field;
     }
 
-    public function checkRoute()
+    public function checkRoute(): void
     {
         $reserved_routes = $this->routes[$this->method_field];
         foreach ($reserved_routes as $reserved_route) {
