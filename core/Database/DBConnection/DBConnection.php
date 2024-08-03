@@ -35,4 +35,9 @@ class DBConnection
             return false;
         }
     }
+
+    public static function newInsertedId()
+    {
+        return self::getDBConnection()->lastInsertId();
+    }
 }
