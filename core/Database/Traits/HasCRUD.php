@@ -3,7 +3,6 @@
 namespace Core\Database\Traits;
 
 use Core\Database\DBConnection\DBConnection;
-use PDO;
 
 trait HasCRUD
 {
@@ -12,14 +11,14 @@ trait HasCRUD
         $fillables = [];
         foreach ($this->fillable as $attribute) {
             $fillables[] = $attribute . ' = ?';
-            $this->setValues($attribute, $array[$attribute]);
+            $this->setValue($attribute, $array[$attribute]);
         }
         return implode(', ', $fillables);
     }
 
     public function insert($array)
     {
-        $this->setSql(sprintf("INSERT INTO %s SET %s,%s=Now();", $this->table, $this->setFillables($array), $this->created_at));
+        $this->setSql(sprintf("INSERT INTO {$this->table} SET %s,%s=Now();", $this->setFillables($array), $this->createdAtColumn));
         $this->executeQuery();
         $this->resetQuery();
         $obj = $this->find(DBConnection::newInsertedId());
@@ -27,7 +26,7 @@ trait HasCRUD
         $allVariables = get_object_vars($obj);
         $differentVariables = array_diff(array_keys($allVariables), array_keys($defaultVariables));
         foreach ($differentVariables as $attribute) {
-            $this->attribute = $obj->$attribute;
+            $this->$attribute = $obj->$attribute;
         }
         $this->resetQuery();
         return $this;
@@ -35,8 +34,8 @@ trait HasCRUD
 
     public function update($array)
     {
-        $this->setSql(sprintf("UPDATE %s SET %s,%s=Now();", $this->table, $this->setFillables($array), $this->updated_at));
-        $this->setWhere("AND ", $this->primaryKey . " = ?");
+        $this->setSql(sprintf("UPDATE %s SET %s, %s=Now()", $this->table, $this->setFillables($array), $this->updatedAtColumn));
+        $this->setWhere(" AND ", $this->primaryKey . " = ?");
         $this->setValue($this->primaryKey, $this->{$this->primaryKey});
         $this->executeQuery();
         $this->resetQuery();
@@ -84,7 +83,7 @@ trait HasCRUD
         return $object->executeQuery();
     }
 
-    public function where($attribute, $value, $operation = "=")
+    public function where($attribute, $operation, $value)
     {
         $condition = $attribute . ' ' . $operation . ' ?';
         $this->setValue($attribute, $value);

@@ -6,6 +6,7 @@ use Core\Database\Traits\HasAttributes;
 use Core\Database\Traits\HasCRUD;
 use Core\Database\Traits\HasQueryBuilder;
 
+#[\AllowDynamicProperties]
 abstract class Model
 {
     use HasQueryBuilder, HasAttributes, HasCRUD;

@@ -2,6 +2,9 @@
 
 namespace Core\Database\DBConnection;
 
+use PDO;
+use PDOException;
+
 class DBConnection
 {
     private static $DBConnectionInstance = null;
@@ -15,7 +18,6 @@ class DBConnection
         if (self::$DBConnectionInstance == null) {
             $DBConnectionInstance = new DBConnection();
             self::$DBConnectionInstance = $DBConnectionInstance->dbConnection();
-
         }
         return self::$DBConnectionInstance;
     }
@@ -26,11 +28,10 @@ class DBConnection
         $servername = DB_HOST;
         $username = DB_USER;
         $password = DB_PASS;
+        $options = array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC);
         try {
-            $conn = new \PDO("mysql:host={$servername};dbname={$dbname}", $username, $password);
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            return $conn;
-        } catch (\PDOException $e) {
+            return new PDO("mysql:host={$servername};dbname={$dbname}", $username, $password, $options);
+        } catch (PDOException $e) {
             echo $e->getMessage();
             return false;
         }

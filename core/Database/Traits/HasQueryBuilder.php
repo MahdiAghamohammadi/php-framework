@@ -6,17 +6,17 @@ use Core\Database\DBConnection\DBConnection;
 
 trait HasQueryBuilder
 {
-    private string $sql;
+    private string $sql = '';
 
-    private array $where;
+    private array $where = [];
 
-    private array $orderBy;
+    private array $orderBy = [];
 
-    private array $limit;
+    private array $limit = [];
 
-    private array $values;
+    private array $values = [];
 
-    private array $bindingValues;
+    private array $bindValues = [];
 
     protected function getSql(): string
     {
@@ -44,9 +44,9 @@ trait HasQueryBuilder
         $this->where = [];
     }
 
-    protected function setOrderBy(string $key, string $expression): void
+    protected function setOrderBy(string $attribute, string $expression): void
     {
-        $this->orderBy[] = $key . ' ' . $expression;
+        $this->orderBy[] = $attribute . ' ' . $expression;
     }
 
     protected function resetOrderBy(): void
@@ -65,16 +65,16 @@ trait HasQueryBuilder
         unset($this->limit['offset'], $this->limit['number']);
     }
 
-    protected function setValue($attr, $value): void
+    protected function setValue($attribute, $value): void
     {
-        $this->values[$attr] = $value;
-        $this->bindingValues[] = $value;
+        $this->values[$attribute] = $value;
+        array_push($this->bindValues, $value);
     }
 
     protected function resetValue(): void
     {
         $this->values = [];
-        $this->bindingValues = [];
+        $this->bindValues = [];
     }
 
     protected function resetQuery(): void
@@ -108,20 +108,18 @@ trait HasQueryBuilder
             $query .= ' LIMIT ' . $this->limit['number'] . ' OFFSET ' . $this->limit['offset'];
         }
 
-        $query = " ;";
+        $query .= " ;";
+        echo $query . "<hr/>";
 
         $pdo = DBConnection::GetDBConnection();
         $stmt = $pdo->prepare($query);
-        if (sizeof($this->bindingValues) > sizeof($this->values)) {
-            sizeof($this->bindingValues) > 0
-                ? $stmt->execute($this->bindingValues)
-                : $stmt->execute();
-        } else {
-            sizeof($this->values) > 0
-                ? $stmt->execute($this->values)
-                : $stmt->execute();
-        }
 
+        if(sizeof($this->bindValues) > sizeof($this->values))
+        {
+            sizeof($this->bindValues) > 0 ? $stmt->execute($this->bindValues) : $stmt->execute();
+        } else {
+            sizeof($this->values) > 0 ? $stmt->execute(array_values($this->values)) : $stmt->execute();
+        }
         return $stmt;
     }
 }

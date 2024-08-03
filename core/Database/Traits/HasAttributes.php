@@ -7,8 +7,8 @@ trait HasAttributes
     private function setAttributes(array $array, $object = null)
     {
         if (!$object) {
-            $class = get_called_class();
-            $object = new $class;
+            $className = get_called_class();
+            $object = new $className;
         }
         foreach ($array as $attribute => $value) {
             $object->$attribute = $value;
@@ -19,8 +19,8 @@ trait HasAttributes
     protected function setObject(array $array): void
     {
         $collection = [];
-        foreach ($array as $key => $value) {
-            $object = $this->setAttributes($array, $value);
+        foreach ($array as $value) {
+            $object = $this->setAttributes($value);
             $collection[] = $object;
         }
         $this->collection = $collection;
