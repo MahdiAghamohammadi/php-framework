@@ -83,4 +83,34 @@ trait HasCRUD
         $object->setValue($this->primaryKey, $id);
         return $object->executeQuery();
     }
+
+    public function where($attribute, $value, $operation = "=")
+    {
+        $condition = $attribute . ' ' . $operation . ' ?';
+        $this->setValue($attribute, $value);
+        $operator = " AND ";
+        $this->setWhere($operator, $condition);
+        return $this;
+    }
+
+    public function orWhere($attribute, $value, $operation = "=")
+    {
+        $condition = $attribute . ' ' . $operation . ' ?';
+        $this->setValue($attribute, $value);
+        $operator = " OR ";
+        $this->setWhere($operator, $condition);
+        return $this;
+    }
+
+    public function orderBy($key, $expression)
+    {
+        $this->setOrderBy($key, $expression);
+        return $this;
+    }
+
+    public function limit($offset, $number)
+    {
+        $this->setLimit($offset, $number);
+        return $this;
+    }
 }
